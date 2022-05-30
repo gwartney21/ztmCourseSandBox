@@ -21,36 +21,42 @@ class App  extends Component{
 
     this.state = {
       input:'',
-      imageUrl:''
+      imageUrl:'',
+      box:{},
       
     }
   }
 
- 
+
 
  onInputChange  = (event)=>{
     this.setState({input:event.target.value})
  }
 
-//  calculateFaceLocation = (data) => {
-//   const clarifaiFace = JSON.parse(data, null, 2).outputs[0].data.regions[0]
-//    .region_info.bounding_box;
-//   const image = document.getElementById("inputimage");
-//   const width = Number(image.width);
-//   const height = Number(image.height);
-//   return {
-//     leftCol: clarifaiFace.left_col * width,
-//     topRow: clarifaiFace.top_row * height,
-//     rightCol: width - clarifaiFace.right_col * width,
-//     bottomRow: height - clarifaiFace.bottom_row * height,
-//   };
-// }
+ calculateFaceLocation = (response)=>{
+     const clarifaiFace =  response.outputs[0].data.regions[0].region_info.bounding_box;
+     const image = document.getElementById('inputimage');
+     const width = Number(image.width);
+     const height = Number(image.height);
+     return {
+      leftCol: clarifaiFace.left_col * width,
+      topRow: clarifaiFace.top_row * height,
+      rightCol: width - clarifaiFace.right_col * width,
+      bottomRow: height - clarifaiFace.bottom_row * height,
+     }
 
+}
+
+displayFaceBox = (box)=>{
+  
+  this.setState({box:box});
+}
+ 
 
 
 onSubmit = () => {
   this.setState({imageUrl:this.state.input})
-  console.log(this.state.imageUrl)
+   
   const raw = JSON.stringify({
     "user_app_id": {
         "user_id": USER_ID,
@@ -78,7 +84,7 @@ const requestOptions = {
 
   fetch("https://api.clarifai.com/v2/models/" + MODEL_ID + "/versions/" + MODEL_VERSION_ID + "/outputs", requestOptions)
   .then(response => response.json())
-  .then(json => console.log(json.outputs[0].data.regions[0].region_info.bounding_box))
+  .then(result =>this.displayFaceBox(this.calculateFaceLocation(result)))
   .catch(error => console.log('error', error));
  
  
@@ -97,7 +103,7 @@ const requestOptions = {
       <ImageLinkForm onInputChange={this.onInputChange} onSubmit={this.onSubmit}/>
 
     
-      <FaceRecognition imageUrl={this.state.imageUrl}/>  
+      <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl}/>  
     </div>
     )
   };
