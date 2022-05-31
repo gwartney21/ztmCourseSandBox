@@ -5,7 +5,7 @@ import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Rank from './components/Rank/Rank';
 import { Component } from 'react';
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
-
+import SignIn from './components/signIn/signIn';
 
 const USER_ID = 'gwartney';
 const PAT = '94dc68e4922549ef9d628f6f02422e9c';
@@ -23,6 +23,7 @@ class App  extends Component{
       input:'',
       imageUrl:'',
       box:{},
+      route:'signIn'
       
     }
   }
@@ -91,19 +92,28 @@ const requestOptions = {
    
  
 }
+
+onRouteChange = (route)=>{
+  this.setState({route:route});
+}
   render(){
     return(
     <div className="App">
-    <Navigation/> 
-     
-      <Logo/>
-     
-      <Rank/>
-
-      <ImageLinkForm onInputChange={this.onInputChange} onSubmit={this.onSubmit}/>
-
-    
-      <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl}/>  
+    <Navigation onRouteChange={this.onRouteChange}/> 
+     { this.state.route === 'signIn'
+        ?<SignIn onRouteChange={this.onRouteChange} />
+        : <div>
+           <Logo/>
+           <Rank/>
+           <ImageLinkForm 
+           onInputChange={this.onInputChange} 
+           onSubmit={this.onSubmit}
+           />
+          <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl}/>  
+ 
+          </div>
+     }
+        
     </div>
     )
   };
